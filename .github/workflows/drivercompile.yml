@@ -1,0 +1,36 @@
+name: Build CHIPSEC Windows driver
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout CHIPSEC
+        uses: actions/checkout@v4
+        with:
+          repository: chipsec/chipsec
+          ref: 2.0.9
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v3
+
+      - name: Build CHIPSEC x64 driver
+        shell: cmd
+        working-directory: drivers\windows\chipsec
+        run: install.cmd
+
+      - name: Show output
+        shell: cmd
+        run: dir chipsec\helper\windows\windows_amd64 /s
+
+      - name: Upload CHIPSEC driver
+        uses: actions/upload-artifact@v4
+        with:
+          name: chipsec-windows-amd64
+          path: chipsec/helper/windows/windows_amd64/*
